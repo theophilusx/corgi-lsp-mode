@@ -1,0 +1,83 @@
+* corgi-lsp-mode
+
+An extension module for [[https://github.com/corgi-emacs][Corgi emacs]] which adds support for [[https://github.com/emacs-lsp/lsp-mode][lsp-mode]]. This
+package is /not/ part of ~corgi-emacs~, but it is implemented to work in conjunction
+with that emacs configuration framework. Any issues encountered with using this
+extension should be reported here and not to the main ~corgi~ repository.
+
+** Installation 
+
+As ~corgi~ uses [[https://github.com/radian-software/straight.el][straight.el]] to install packages and ~use-package~ to manage
+configuration, you can install this module by adding the following to your corgi
+~init.el~ file.
+
+#+begin_src emacs-lisp
+  (use-package corgi-lsp-mode
+    :straight (:host github :repo "theophilusx/corgi-lsp-mode")i
+    :config
+    ;; load default key bindings - see README
+    (corgi-lsp-mode/load-default-bindings))
+
+#+end_src
+
+** Key Bindings
+
+This package also sets up some key bindings. However, the current implementation
+is a definite /hack/, but seems to work OK. Once we have something a little more
+elegant, I will update this package accordingly.
+
+As it currently stands, you need to add two additional blocks of code to your
+~init.el~ file. Add the following to your ~init.el~ file *BEFORE* loading
+~corgi-lsp-mode~.
+
+#+begin_src emacs-lisp
+  ;; Add default key and signal files to global lists
+  (defvar *key-files-list* (list 'corgi-keys 'user-keys)
+    "List of corkey key definition files.")
+
+  (defvar *signal-files-list* (list 'corgi-signals 'user-signals)
+    "List of corkey signal definition files.")
+
+#+end_src
+
+At the end of your ~init.el~, add the following
+
+#+begin_src emacs-lisp
+  ;; Load the corkey key and signal definitions and
+  ;; watch for changes
+  (corkey/load-and-watch *key-files-list* *signal-files-list*)
+
+#+end_src
+
+You don't need the above two blocks if your not using the default key bindings
+(i.e. do not call ~corgi-lsp-mode/load-default-bindings~)
+
+** TODO
+
+*** Sort out key bindings
+
+LSP mode provides a lot of additional functionality. Precisely what
+functionality is supported depends on the language server being used. Likewise,
+some features of the language server protocol only make sense for some languages
+and not others. For example, support to display type information and type
+hierarchies really only becomes useful in strongly typed languages.
+
+To get the most out of ~lsp-mode~ and to provide the most useful UI, the key
+bindings used in each supported mode really need to be refined and made mode
+specific. In particular
+
+  - Only include key bindings which make sense for that mode
+  - Only include key bindings which are useful
+
+The first one is relatively easy to do. However, I have not yet completed this
+task. Currently, only key bindings for Clojure and Javascript are defined. I
+have not yet filtered out those bindings which don't make sense for these modes.
+Essentially, I have just taken the default key bindings and mapped them to close
+Corkey equivalents.
+
+Refining the mode key bindings to only include /useful/ bindings is harder due to
+the subjective nature of the task. At this time, I have not used enough of
+~lsp-mode~ to identify which functionality I find useful and which I find to be
+just noise or distraction. I plan to refine the definitions over time as I use
+the system. This will of course be subjective and your preferences may well
+differ.
